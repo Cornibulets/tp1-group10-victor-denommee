@@ -85,6 +85,6 @@ public class ServeurBanque extends Serveur {
      */
     public void supprimeInactifs() {
         //À définir :
-        // TODO 1.2
+        // TODO 1.2 : Kevin
     }
 }

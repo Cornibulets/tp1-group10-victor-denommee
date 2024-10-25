@@ -2,8 +2,8 @@ package com.atoudeft.banque;
 
 import java.io.Serializable;
 
-// TODO 2.1 Créer une classe CompteCheque qui hérite de cette classe et implémente toutes les fonctions
-// TODO 4.1 Créer une classe CompteEpargne qui hérite de cette classe et impléemnte toutes les fonctions et +
+// TODO 2.1 : Alex -> Créer une classe CompteCheque qui hérite de cette classe et implémente toutes les fonctions
+// TODO 4.1 : Kevin -> Créer une classe CompteEpargne qui hérite de cette classe et impléemnte toutes les fonctions et +
 public abstract class CompteBancaire implements Serializable {
     private String numero;
     private TypeCompte type;

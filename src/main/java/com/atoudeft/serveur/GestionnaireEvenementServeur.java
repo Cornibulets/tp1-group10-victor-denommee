@@ -80,8 +80,13 @@ public class GestionnaireEvenementServeur implements GestionnaireEvenement {
                             cnx.envoyer("NOUVEAU NO "+t[0]+" existe");
                     }
                     break;
-                // TODO 3.1 Ajouter CONNECT
+                // TODO 3.1 : Alex -> Ajouter CONNECT
                 // TODO 4.2 Ajouter EPARGNE (dépend de 4.1)
+                // TODO 5.1 Ajouter SELECT (dépend de Q2 et Q4)
+                // TODO 6.1 Ajouter DEPOT (dépend de Q2 et Q4)
+                // TODO 6.2 Ajouter RETRAIT (dépend de Q2 et Q4)
+                // TODO 6.3 Ajouter FACTURE (dépend de Q2 et Q4)
+                // TODO 6.4 Ajouter TRANSFER (dépend de Q2 et Q4)
                 /******************* TRAITEMENT PAR DÉFAUT *******************/
                 default: //Renvoyer le texte recu convertit en majuscules :
                     msg = (evenement.getType() + " " + evenement.getArgument()).toUpperCase();

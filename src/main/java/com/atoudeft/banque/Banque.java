@@ -112,7 +112,7 @@ public class Banque implements Serializable {
                 . Créer un compte-chèque avec ce numéro et l'ajouter au compte-client;
                 . Ajouter le compte-client à la liste des comptes et retourner true.
          */
-        // TODO 2.2
+        // TODO 2.2 : Alex
         return this.comptes.add(new CompteClient(numCompteClient,nip)); //À modifier
     }
 
@@ -124,7 +124,7 @@ public class Banque implements Serializable {
      */
     public String getNumeroCompteParDefaut(String numCompteClient) {
         //À compléter : retourner le numéro du compte-chèque du compte-client.
-        // TODO 2.3
+        // TODO 2.3 : Alex
         return null; //À modifier
     }
 }
