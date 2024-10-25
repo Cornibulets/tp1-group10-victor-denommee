@@ -30,6 +30,7 @@ public class ConnexionBanque extends Connexion {
      */
     public boolean estInactifDepuis(long delai) {
         //À définir :
+        // TODO 1.1
         throw new NotImplementedException();//ligne à supprimer
     }
 
