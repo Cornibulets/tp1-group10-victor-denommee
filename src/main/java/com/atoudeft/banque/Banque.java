@@ -112,7 +112,34 @@ public class Banque implements Serializable {
                 . Créer un compte-chèque avec ce numéro et l'ajouter au compte-client;
                 . Ajouter le compte-client à la liste des comptes et retourner true.
          */
-        // TODO 2.2 : Alex
+        // Vérification du numéro de compte
+        if (numCompteClient.length() < 6 || numCompteClient.length() > 8)
+            return false;
+
+        for (int i = 0; i < numCompteClient.length(); i++) {
+            char currentChar = numCompteClient.charAt(i);
+            if(!(currentChar >= 65 && currentChar <= 90) && !(currentChar >= 48 && currentChar <= 57))
+                return false;
+        }
+
+        // Vérifier si le compte existe déjà
+        // TODO : Alex -> Implementer recherche binaire
+        for(int i = 0;i < this.comptes.size();i++){
+            if(this.comptes.get(i).getNumero().equals(numCompteClient))
+                return false;
+        }
+
+        // Vérification du nip
+        if (nip.length() < 4 || nip.length() > 5)
+            return false;
+
+        for (int i = 0; i < nip.length(); i++) {
+            if (nip.charAt(i) < 48 || nip.charAt(i) > 57)
+                return false;
+        }
+
+        // Reste à implémenter la classe CompteCheque pour terminer cette section
+
         return this.comptes.add(new CompteClient(numCompteClient,nip)); //À modifier
     }
 
