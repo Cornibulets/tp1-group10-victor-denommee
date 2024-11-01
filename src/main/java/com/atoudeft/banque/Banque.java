@@ -112,7 +112,21 @@ public class Banque implements Serializable {
                 . Créer un compte-chèque avec ce numéro et l'ajouter au compte-client;
                 . Ajouter le compte-client à la liste des comptes et retourner true.
          */
-        // Vérification du numéro de compte
+
+        // Validations du numéro de compte et nip
+        if(!validerNumeroCompte(numCompteClient)) return false;
+        if(compteExisteDeja(numCompteClient)) return false;
+        if(!validerNip(nip)) return false;
+
+        // Création du compte client et compte chèque par défaut
+        CompteClient nouveauCompte = new CompteClient(numCompteClient,nip);
+        CompteCheque nouveauCompteCheque = new CompteCheque(genererNumCompteBancaireUnique());
+        nouveauCompte.ajouter(nouveauCompteCheque);
+
+        return this.comptes.add(nouveauCompte);
+    }
+
+    private boolean validerNumeroCompte(String numCompteClient){
         if (numCompteClient.length() < 6 || numCompteClient.length() > 8)
             return false;
 
@@ -122,14 +136,21 @@ public class Banque implements Serializable {
                 return false;
         }
 
-        // Vérifier si le compte existe déjà
-        // TODO : Alex -> Implementer recherche binaire
+        return true;
+    }
+
+    private boolean compteExisteDeja(String numCompteClient){
+        // TODO : Alex -> Implementer recherche binaire?
+
         for(int i = 0;i < this.comptes.size();i++){
             if(this.comptes.get(i).getNumero().equals(numCompteClient))
-                return false;
+                return true;
         }
 
-        // Vérification du nip
+        return false;
+    }
+
+    private boolean validerNip(String nip){
         if (nip.length() < 4 || nip.length() > 5)
             return false;
 
@@ -138,9 +159,26 @@ public class Banque implements Serializable {
                 return false;
         }
 
-        // Reste à implémenter la classe CompteCheque pour terminer cette section
+        return true;
+    }
 
-        return this.comptes.add(new CompteClient(numCompteClient,nip)); //À modifier
+    private String genererNumCompteBancaireUnique(){
+        String numeroCompte = CompteBancaire.genereNouveauNumero();
+        boolean unique = false;
+
+        while(!unique){
+            unique = true;
+            for(int i = 0;i < this.comptes.size();i++){
+                for(int j = 0;j < this.comptes.get(i).getComptes().size();j++){
+                    if(this.comptes.get(i).getComptes().get(j).getNumero().equals(numeroCompte)){
+                        unique = false;
+                        numeroCompte = CompteBancaire.genereNouveauNumero();
+                    }
+                }
+            }
+        }
+
+        return numeroCompte;
     }
 
     /**
