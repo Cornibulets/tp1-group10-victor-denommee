@@ -5,6 +5,7 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Banque implements Serializable {
     private String nom;
@@ -140,14 +141,8 @@ public class Banque implements Serializable {
     }
 
     private boolean compteExisteDeja(String numCompteClient){
-        // TODO : Alex -> Implementer recherche binaire?
-
-        for(int i = 0;i < this.comptes.size();i++){
-            if(this.comptes.get(i).getNumero().equals(numCompteClient))
-                return true;
-        }
-
-        return false;
+        if(findCompteClient(numCompteClient)==null) return false;
+        return true;
     }
 
     private boolean validerNip(String nip){
@@ -181,6 +176,14 @@ public class Banque implements Serializable {
         return numeroCompte;
     }
 
+    private CompteClient findCompteClient(String numCompteClient){
+        for(int i = 0;i < this.comptes.size();i++){
+            if(this.comptes.get(i).getNumero().equals(numCompteClient))
+                return this.comptes.get(i);
+        }
+        return null;
+    }
+
     /**
      * Retourne le numéro du compte-chèque d'un client à partir de son numéro de compte-client.
      *
@@ -188,8 +191,6 @@ public class Banque implements Serializable {
      * @return numéro du compte-chèque du client ayant le numéro de compte-client
      */
     public String getNumeroCompteParDefaut(String numCompteClient) {
-        //À compléter : retourner le numéro du compte-chèque du compte-client.
-        // TODO 2.3 : Alex
-        return null; //À modifier
+        return findCompteClient(numCompteClient).getCompte(0).getNumero();
     }
 }

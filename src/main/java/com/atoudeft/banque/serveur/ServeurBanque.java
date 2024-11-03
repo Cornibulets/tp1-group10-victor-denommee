@@ -75,7 +75,8 @@ public class ServeurBanque extends Serveur {
     public String list() {
         String s = "";
         for (Connexion cnx:connectes) {
-            s += ((ConnexionBanque)cnx).getNumeroCompteClient() + ":";
+            if(((ConnexionBanque)cnx).getNumeroCompteClient() != null)
+                s += ((ConnexionBanque)cnx).getNumeroCompteClient() + ":";
         }
         return s;
     }

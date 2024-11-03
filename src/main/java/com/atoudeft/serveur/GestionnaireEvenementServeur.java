@@ -1,6 +1,7 @@
 package com.atoudeft.serveur;
 
 import com.atoudeft.banque.Banque;
+import com.atoudeft.banque.CompteClient;
 import com.atoudeft.banque.serveur.ConnexionBanque;
 import com.atoudeft.banque.serveur.ServeurBanque;
 import com.atoudeft.commun.evenement.Evenement;
@@ -80,7 +81,41 @@ public class GestionnaireEvenementServeur implements GestionnaireEvenement {
                             cnx.envoyer("NOUVEAU NO "+t[0]+" existe");
                     }
                     break;
-                // TODO 3.1 : Alex -> Ajouter CONNECT
+                case "CONNECT": // Connection à un compte-client
+                    String info[] = evenement.getArgument().split(":");
+                    String numCompteClientEvt = info[0], nipEvt = info[1];
+                    banque = serveurBanque.getBanque();
+
+                    for(Connexion c:serveurBanque.connectes){
+                        ConnexionBanque cb = (ConnexionBanque)c;
+                        if(cb.getNumeroCompteClient() != null && cb.getNumeroCompteClient().equals(numCompteClientEvt)){
+                            cnx.envoyer("CONNECT NO: CLIENT ALREADY CONNECTED");
+                            break;
+                        }
+                    }
+
+                    CompteClient compteClient = banque.getCompteClient(numCompteClientEvt);
+
+                    if(compteClient == null) {
+                        cnx.envoyer("CONNECT NO: INVALID CLIENT NUMBER");
+                        break;
+                    }
+                    if(!compteClient.verifierNip(nipEvt)) {
+                        cnx.envoyer("CONNECT NO: WRONG NIP");
+                        break;
+                    }
+
+                    cnx.setNumeroCompteClient(compteClient.getNumero());
+                    cnx.setNumeroCompteActuel(banque.getNumeroCompteParDefaut(compteClient.getNumero()));
+                    break;
+                case "DISCONNECT":
+                    numCompteClient = cnx.getNumeroCompteClient().toUpperCase(); // copie le string
+                    if(cnx.getNumeroCompteClient() != null && !cnx.getNumeroCompteClient().isEmpty()){
+                        cnx.setNumeroCompteClient(null);
+                        cnx.setNumeroCompteActuel(null);
+                    }
+                    cnx.envoyer(String.format("DISCONNECTED %s", numCompteClient));
+                    break;
                 // TODO 4.2 Ajouter EPARGNE (dépend de 4.1)
                 // TODO 5.1 Ajouter SELECT (dépend de Q2 et Q4)
                 // TODO 6.1 Ajouter DEPOT (dépend de Q2 et Q4)
