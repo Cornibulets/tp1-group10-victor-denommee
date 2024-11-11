@@ -1,6 +1,7 @@
 package com.atoudeft.banque.serveur;
 
 import com.atoudeft.banque.CompteBancaire;
+import com.atoudeft.banque.CompteClient;
 import com.atoudeft.commun.net.Connexion;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
@@ -11,6 +12,7 @@ public class ConnexionBanque extends Connexion {
     private long tempsDerniereOperation;
     //Le numéro du compte sur lequel se font les opérations en ce moment :
     private String numeroCompteActuel;
+    private CompteClient compteClient;
     /**
      * Construit une connexion sur un socket, initialisant les flux de caractères utilisés par le socket et le moment
      * de la dernière opération effectuée par client utilisant cette connexion.
@@ -84,5 +86,13 @@ public class ConnexionBanque extends Connexion {
      */
     public void setNumeroCompteActuel(String numeroCompteActuel) {
         this.numeroCompteActuel = numeroCompteActuel;
+    }
+
+    public void setCompteClient(CompteClient compteClient) {
+        this.compteClient = compteClient;
+    }
+
+    public CompteClient getCompteClient() {
+        return compteClient;
     }
 }

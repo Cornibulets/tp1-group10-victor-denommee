@@ -1,12 +1,15 @@
 package com.atoudeft.serveur;
 
 import com.atoudeft.banque.Banque;
+import com.atoudeft.banque.CompteBancaire;
 import com.atoudeft.banque.CompteClient;
 import com.atoudeft.banque.serveur.ConnexionBanque;
 import com.atoudeft.banque.serveur.ServeurBanque;
 import com.atoudeft.commun.evenement.Evenement;
 import com.atoudeft.commun.evenement.GestionnaireEvenement;
 import com.atoudeft.commun.net.Connexion;
+
+import java.util.List;
 
 /**
  * Cette classe représente un gestionnaire d'événement d'un serveur. Lorsqu'un serveur reçoit un texte d'un client,
@@ -59,36 +62,35 @@ public class GestionnaireEvenementServeur implements GestionnaireEvenement {
                     break;
                 /******************* COMMANDES DE GESTION DE COMPTES *******************/
                 case "NOUVEAU": //Crée un nouveau compte-client :
-                    if (cnx.getNumeroCompteClient()!=null) {
+                    if (cnx.getNumeroCompteClient() != null) {
                         cnx.envoyer("NOUVEAU NO deja connecte");
                         break;
                     }
                     argument = evenement.getArgument();
                     t = argument.split(":");
-                    if (t.length<2) {
+                    if (t.length < 2) {
                         cnx.envoyer("NOUVEAU NO");
-                    }
-                    else {
+                    } else {
                         numCompteClient = t[0];
                         nip = t[1];
                         banque = serveurBanque.getBanque();
-                        if (banque.ajouter(numCompteClient,nip)) {
+                        if (banque.ajouter(numCompteClient, nip)) {
+                            CompteClient compteClient = banque.getCompteClient(numCompteClient);
                             cnx.setNumeroCompteClient(numCompteClient);
                             cnx.setNumeroCompteActuel(banque.getNumeroCompteParDefaut(numCompteClient));
+                            cnx.setCompteClient(compteClient);
                             cnx.envoyer("NOUVEAU OK " + t[0] + " cree");
-                        }
-                        else
-                            cnx.envoyer("NOUVEAU NO "+t[0]+" existe");
+                        } else cnx.envoyer("NOUVEAU NO " + t[0] + " existe");
                     }
                     break;
                 case "CONNECT": // Connection à un compte-client
-                    String info[] = evenement.getArgument().split(":");
+                    String[] info = evenement.getArgument().split(":");
                     String numCompteClientEvt = info[0], nipEvt = info[1];
                     banque = serveurBanque.getBanque();
 
-                    for(Connexion c:serveurBanque.connectes){
-                        ConnexionBanque cb = (ConnexionBanque)c;
-                        if(cb.getNumeroCompteClient() != null && cb.getNumeroCompteClient().equals(numCompteClientEvt)){
+                    for (Connexion c : serveurBanque.connectes) {
+                        ConnexionBanque cb = (ConnexionBanque) c;
+                        if (cb.getNumeroCompteClient() != null && cb.getNumeroCompteClient().equals(numCompteClientEvt)) {
                             cnx.envoyer("CONNECT NO: CLIENT ALREADY CONNECTED");
                             break;
                         }
@@ -96,23 +98,25 @@ public class GestionnaireEvenementServeur implements GestionnaireEvenement {
 
                     CompteClient compteClient = banque.getCompteClient(numCompteClientEvt);
 
-                    if(compteClient == null) {
+                    if (compteClient == null) {
                         cnx.envoyer("CONNECT NO: INVALID CLIENT NUMBER");
                         break;
                     }
-                    if(!compteClient.verifierNip(nipEvt)) {
+                    if (!compteClient.verifierNip(nipEvt)) {
                         cnx.envoyer("CONNECT NO: WRONG NIP");
                         break;
                     }
 
                     cnx.setNumeroCompteClient(compteClient.getNumero());
+                    cnx.setCompteClient(compteClient);
                     cnx.setNumeroCompteActuel(banque.getNumeroCompteParDefaut(compteClient.getNumero()));
                     break;
                 case "DISCONNECT":
                     numCompteClient = cnx.getNumeroCompteClient().toUpperCase(); // copie le string
-                    if(cnx.getNumeroCompteClient() != null && !cnx.getNumeroCompteClient().isEmpty()){
+                    if (cnx.getNumeroCompteClient() != null && !cnx.getNumeroCompteClient().isEmpty()) {
                         cnx.setNumeroCompteClient(null);
                         cnx.setNumeroCompteActuel(null);
+                        cnx.setCompteClient(null);
                     }
                     cnx.envoyer(String.format("DISCONNECTED %s", numCompteClient));
                     break;
