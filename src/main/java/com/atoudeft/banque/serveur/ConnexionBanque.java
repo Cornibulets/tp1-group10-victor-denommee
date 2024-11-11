@@ -13,6 +13,7 @@ public class ConnexionBanque extends Connexion {
     //Le numéro du compte sur lequel se font les opérations en ce moment :
     private String numeroCompteActuel;
     private CompteClient compteClient;
+    private CompteBancaire compteBancaireActuel;
     /**
      * Construit une connexion sur un socket, initialisant les flux de caractères utilisés par le socket et le moment
      * de la dernière opération effectuée par client utilisant cette connexion.
@@ -94,5 +95,13 @@ public class ConnexionBanque extends Connexion {
 
     public CompteClient getCompteClient() {
         return compteClient;
+    }
+
+    public CompteBancaire getCompteBancaireActuel() {
+        return compteBancaireActuel;
+    }
+
+    public void setCompteBancaireActuel(CompteBancaire compte) {
+        this.compteBancaireActuel = compte;
     }
 }

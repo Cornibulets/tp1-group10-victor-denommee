@@ -79,6 +79,7 @@ public class GestionnaireEvenementServeur implements GestionnaireEvenement {
                             cnx.setNumeroCompteClient(numCompteClient);
                             cnx.setNumeroCompteActuel(banque.getNumeroCompteParDefaut(numCompteClient));
                             cnx.setCompteClient(compteClient);
+                            cnx.setCompteBancaireActuel(compteClient.getComptes().get(0));
                             cnx.envoyer("NOUVEAU OK " + t[0] + " cree");
                         } else cnx.envoyer("NOUVEAU NO " + t[0] + " existe");
                     }
@@ -134,6 +135,7 @@ public class GestionnaireEvenementServeur implements GestionnaireEvenement {
                         for (CompteBancaire c : comptesBancaires) {
                             if (c.getType().toString().equals(typeCompte)) {
                                 cnx.setNumeroCompteActuel(c.getNumero());
+                                cnx.setCompteBancaireActuel(c);
                                 cnx.envoyer("SELECT OK");
                                 break switchTraitement;
                             }
@@ -143,6 +145,14 @@ public class GestionnaireEvenementServeur implements GestionnaireEvenement {
                     break;
 
                 case "DEPOT":
+                    if (cnx.getCompteClient() != null && cnx.getCompteBancaireActuel() != null) {
+                        float montant = Float.parseFloat(evenement.getArgument());
+                        if (cnx.getCompteBancaireActuel().crediter(montant)) {
+                            cnx.envoyer("DEPOT OK");
+                            cnx.envoyer(String.valueOf(cnx.getCompteBancaireActuel().getSolde()));
+                            break;
+                        }
+                    }
                     cnx.envoyer("DEPOT NO");
                     break;
 
