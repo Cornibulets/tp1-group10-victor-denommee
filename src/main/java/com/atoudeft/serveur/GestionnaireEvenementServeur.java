@@ -180,10 +180,29 @@ public class GestionnaireEvenementServeur implements GestionnaireEvenement {
                                     cnx.envoyer("FACTURE OK");
                                     break;
                                 }
-                            } catch (NumberFormatException ignored) { }
+                            } catch (NumberFormatException ignored) {
+                            }
                         }
                     }
                     cnx.envoyer("FACTURE NO");
+                    break;
+
+                case "TRANSFER":
+                    if (cnx.getCompteClient() != null && cnx.getCompteBancaireActuel() != null) {
+                        String[] args = evenement.getArgument().split(" ");
+                        if (args.length == 2) {
+                            try {
+                                double montant = Float.parseFloat(args[0]);
+                                String numeroCompte = args[1];
+                                if (cnx.getCompteBancaireActuel().transferer(montant, numeroCompte)) {
+                                    cnx.envoyer("FACTURE OK");
+                                    break;
+                                }
+                            } catch (NumberFormatException ignored) {
+                            }
+                        }
+                    }
+                    cnx.envoyer("TRANSFER NO");
                     break;
 
                 case "SOLDE":
