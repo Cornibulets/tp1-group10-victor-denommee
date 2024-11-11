@@ -9,6 +9,7 @@ import com.atoudeft.commun.evenement.Evenement;
 import com.atoudeft.commun.evenement.GestionnaireEvenement;
 import com.atoudeft.commun.net.Connexion;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -50,7 +51,8 @@ public class GestionnaireEvenementServeur implements GestionnaireEvenement {
             System.out.println("SERVEUR: Recu : " + evenement.getType() + " " + evenement.getArgument());
             typeEvenement = evenement.getType();
             cnx.setTempsDerniereOperation(System.currentTimeMillis());
-            switchTraitement: switch (typeEvenement) {
+            switchTraitement:
+            switch (typeEvenement) {
                 /******************* COMMANDES GÉNÉRALES *******************/
                 case "EXIT": //Ferme la connexion avec le client qui a envoyé "EXIT":
                     cnx.envoyer("END");
@@ -164,6 +166,24 @@ public class GestionnaireEvenementServeur implements GestionnaireEvenement {
                         }
                     }
                     cnx.envoyer("RETRAIT NO");
+                    break;
+
+                case "FACTURE":
+                    if (cnx.getCompteClient() != null && cnx.getCompteBancaireActuel() != null) {
+                        String[] args = evenement.getArgument().split(" ");
+                        if (args.length >= 3) {
+                            try {
+                                double montant = Float.parseFloat(args[0]);
+                                String numeroFacture = args[1];
+                                String descriptionFacture = String.join(" ", Arrays.copyOfRange(args, 2, args.length));
+                                if (cnx.getCompteBancaireActuel().payerFacture(numeroFacture, montant, descriptionFacture)) {
+                                    cnx.envoyer("FACTURE OK");
+                                    break;
+                                }
+                            } catch (NumberFormatException ignored) { }
+                        }
+                    }
+                    cnx.envoyer("FACTURE NO");
                     break;
 
                 case "SOLDE":
