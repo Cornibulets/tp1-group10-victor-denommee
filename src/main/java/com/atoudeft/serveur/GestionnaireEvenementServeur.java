@@ -149,13 +149,30 @@ public class GestionnaireEvenementServeur implements GestionnaireEvenement {
                         float montant = Float.parseFloat(evenement.getArgument());
                         if (cnx.getCompteBancaireActuel().crediter(montant)) {
                             cnx.envoyer("DEPOT OK");
-                            cnx.envoyer(String.valueOf(cnx.getCompteBancaireActuel().getSolde()));
                             break;
                         }
                     }
                     cnx.envoyer("DEPOT NO");
                     break;
 
+                case "RETRAIT":
+                    if (cnx.getCompteClient() != null && cnx.getCompteBancaireActuel() != null) {
+                        float montant = Float.parseFloat(evenement.getArgument());
+                        if (cnx.getCompteBancaireActuel().debiter(montant)) {
+                            cnx.envoyer("RETRAIT OK");
+                            break;
+                        }
+                    }
+                    cnx.envoyer("RETRAIT NO");
+                    break;
+
+                case "SOLDE":
+                    if (cnx.getCompteClient() != null && cnx.getCompteBancaireActuel() != null) {
+                        cnx.envoyer("SOLDE OK: " + cnx.getCompteBancaireActuel().getSolde() + "$");
+                        break;
+                    }
+                    cnx.envoyer("SOLDE NO");
+                    break;
 
                 /******************* TRAITEMENT PAR DÉFAUT *******************/
                 default: //Renvoyer le texte recu convertit en majuscules :
