@@ -20,7 +20,7 @@ import java.util.List;
  * @since 2023-09-01
  */
 public class GestionnaireEvenementServeur implements GestionnaireEvenement {
-    private Serveur serveur;
+    private final Serveur serveur;
 
     /**
      * Construit un gestionnaire d'événements pour un serveur.
@@ -39,7 +39,7 @@ public class GestionnaireEvenementServeur implements GestionnaireEvenement {
     @Override
     public void traiter(Evenement evenement) {
         Object source = evenement.getSource();
-        ServeurBanque serveurBanque = (ServeurBanque)serveur;
+        ServeurBanque serveurBanque = (ServeurBanque) serveur;
         Banque banque;
         ConnexionBanque cnx;
         String msg, typeEvenement, argument, numCompteClient, nip;
@@ -50,7 +50,7 @@ public class GestionnaireEvenementServeur implements GestionnaireEvenement {
             System.out.println("SERVEUR: Recu : " + evenement.getType() + " " + evenement.getArgument());
             typeEvenement = evenement.getType();
             cnx.setTempsDerniereOperation(System.currentTimeMillis());
-            switch (typeEvenement) {
+            switchTraitement: switch (typeEvenement) {
                 /******************* COMMANDES GÉNÉRALES *******************/
                 case "EXIT": //Ferme la connexion avec le client qui a envoyé "EXIT":
                     cnx.envoyer("END");
@@ -126,6 +126,27 @@ public class GestionnaireEvenementServeur implements GestionnaireEvenement {
                 // TODO 6.2 Ajouter RETRAIT (dépend de Q2 et Q4)
                 // TODO 6.3 Ajouter FACTURE (dépend de Q2 et Q4)
                 // TODO 6.4 Ajouter TRANSFER (dépend de Q2 et Q4)
+
+                case "SELECT":
+                    if (cnx.getCompteClient() != null) {
+                        String typeCompte = evenement.getArgument();
+                        List<CompteBancaire> comptesBancaires = cnx.getCompteClient().getComptes();
+                        for (CompteBancaire c : comptesBancaires) {
+                            if (c.getType().toString().equals(typeCompte)) {
+                                cnx.setNumeroCompteActuel(c.getNumero());
+                                cnx.envoyer("SELECT OK");
+                                break switchTraitement;
+                            }
+                        }
+                    }
+                    cnx.envoyer("SELECT NO");
+                    break;
+
+                case "DEPOT":
+                    cnx.envoyer("DEPOT NO");
+                    break;
+
+
                 /******************* TRAITEMENT PAR DÉFAUT *******************/
                 default: //Renvoyer le texte recu convertit en majuscules :
                     msg = (evenement.getType() + " " + evenement.getArgument()).toUpperCase();
