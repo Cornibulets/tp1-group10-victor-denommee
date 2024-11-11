@@ -195,7 +195,7 @@ public class GestionnaireEvenementServeur implements GestionnaireEvenement {
                                 double montant = Float.parseFloat(args[0]);
                                 String numeroCompte = args[1];
                                 if (cnx.getCompteBancaireActuel().transferer(montant, numeroCompte)) {
-                                    cnx.envoyer("FACTURE OK");
+                                    cnx.envoyer("TRANSFER OK");
                                     break;
                                 }
                             } catch (NumberFormatException ignored) {
