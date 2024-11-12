@@ -3,12 +3,15 @@ package com.atoudeft.serveur;
 import com.atoudeft.banque.Banque;
 import com.atoudeft.banque.CompteBancaire;
 import com.atoudeft.banque.CompteClient;
+import com.atoudeft.banque.TypeCompte;
+import com.atoudeft.banque.serveur.CompteEpargne;
 import com.atoudeft.banque.serveur.ConnexionBanque;
 import com.atoudeft.banque.serveur.ServeurBanque;
 import com.atoudeft.commun.evenement.Evenement;
 import com.atoudeft.commun.evenement.GestionnaireEvenement;
 import com.atoudeft.commun.net.Connexion;
 
+import java.awt.image.BandCombineOp;
 import java.util.Arrays;
 import java.util.List;
 
@@ -123,6 +126,27 @@ public class GestionnaireEvenementServeur implements GestionnaireEvenement {
                     }
                     cnx.envoyer(String.format("DISCONNECTED %s", numCompteClient));
                     break;
+                case "EPARGNE" :
+                    //Verifier si le client est connecté et qu'il ne possède pas de compte épargne
+                    if (cnx.getCompteClient() == null) {
+                        boolean compteEp = false;
+                        for (CompteBancaire compte : cnx.getCompteClient().getComptes()) {
+                            if (compte.getType() == TypeCompte.EPARGNE) {
+                                compteEp = true;
+                                break;
+                            }
+                        }
+                        if (compteEp) {
+                            System.out.println("EPARGNE NO");
+                        } else {
+                            String numeroEp;
+                            do {
+                                numeroEp = CompteBancaire.genereNouveauNumero();
+                            } while (numeroEp != cnx.getNumeroCompteClient());
+                            CompteEpargne nouveauCompte = new CompteEpargne(numeroEp, TypeCompte.EPARGNE, 5);
+                        }
+                    }
+
                 // TODO 4.2 Ajouter EPARGNE (dépend de 4.1)
                 // TODO 5.1 Ajouter SELECT (dépend de Q2 et Q4)
                 // TODO 6.1 Ajouter DEPOT (dépend de Q2 et Q4)
