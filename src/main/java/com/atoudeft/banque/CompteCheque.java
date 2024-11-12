@@ -18,17 +18,9 @@ public class CompteCheque extends CompteBancaire{
         return true;
     }
     public boolean payerFacture(String numeroFacture, double montant, String description){
-        if(this.debiter(montant)){
-            // ajouter une entrée dans l'historique
-            return true;
-        }
         return false;
     }
     public boolean transferer(double montant, String numeroCompteDestinataire){
-        if(this.debiter(montant)){
-            // ajouter une entrée dans l'historique
-            return true;
-        }
         return false;
     }
 }

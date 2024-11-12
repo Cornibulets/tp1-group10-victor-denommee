@@ -1,7 +1,4 @@
-package com.atoudeft.banque.serveur;
-
-import com.atoudeft.banque.CompteBancaire;
-import com.atoudeft.banque.TypeCompte;
+package com.atoudeft.banque;
 
 public class CompteEpargne extends CompteBancaire {
     //Variables
@@ -21,19 +18,22 @@ public class CompteEpargne extends CompteBancaire {
 
     @Override
     public boolean crediter(double montant) {
-        if (montant > 0)
+        if (montant > 0){
             solde += montant;
+            return true;
+        }
         return false;
     }
 
     @Override
     public boolean debiter(double montant) {
         if (montant > 0 && solde >= montant) {
+            if (solde < LIMITE_SOLDE)
+                solde -= FRAIS; // le compte pourrait être négatif après cette opération et le retrait, on assume que c'est ok
             solde -= montant;
+            return true;
         }
-           if (solde < LIMITE_SOLDE) {
-            solde -= FRAIS;
-           }
+
         return false;
     }
 
@@ -48,7 +48,7 @@ public class CompteEpargne extends CompteBancaire {
     }
 
     public void ajouterInterets() {
-        double interets = (solde * tauxInterets) / 100;
-        solde += interets;
+        // double interets = solde * tauxInterets / 100.; // mettre les calculs simples sur une ligne et éviter de créer des variables inutilement
+        solde += solde * tauxInterets / 100.;
     }
 }

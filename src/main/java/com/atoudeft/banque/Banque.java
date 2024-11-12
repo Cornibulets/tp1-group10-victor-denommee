@@ -157,7 +157,7 @@ public class Banque implements Serializable {
         return true;
     }
 
-    private String genererNumCompteBancaireUnique(){
+    public String genererNumCompteBancaireUnique(){
         String numeroCompte = CompteBancaire.genereNouveauNumero();
         boolean unique = false;
 
@@ -192,5 +192,9 @@ public class Banque implements Serializable {
      */
     public String getNumeroCompteParDefaut(String numCompteClient) {
         return findCompteClient(numCompteClient).getCompte(0).getNumero();
+    }
+
+    public CompteBancaire getCompteParDefaut(String numCompteClient){
+        return findCompteClient(numCompteClient).getCompte(0);
     }
 }

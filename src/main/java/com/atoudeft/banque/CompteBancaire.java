@@ -2,7 +2,6 @@ package com.atoudeft.banque;
 
 import java.io.Serializable;
 
-// TODO 4.1 : Kevin -> Créer une classe CompteEpargne qui hérite de cette classe et implémente toutes les méthodes et +
 public abstract class CompteBancaire implements Serializable {
     private String numero;
     private TypeCompte type;

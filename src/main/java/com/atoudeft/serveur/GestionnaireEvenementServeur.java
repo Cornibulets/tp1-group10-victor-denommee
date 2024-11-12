@@ -4,14 +4,13 @@ import com.atoudeft.banque.Banque;
 import com.atoudeft.banque.CompteBancaire;
 import com.atoudeft.banque.CompteClient;
 import com.atoudeft.banque.TypeCompte;
-import com.atoudeft.banque.serveur.CompteEpargne;
+import com.atoudeft.banque.CompteEpargne;
 import com.atoudeft.banque.serveur.ConnexionBanque;
 import com.atoudeft.banque.serveur.ServeurBanque;
 import com.atoudeft.commun.evenement.Evenement;
 import com.atoudeft.commun.evenement.GestionnaireEvenement;
 import com.atoudeft.commun.net.Connexion;
 
-import java.awt.image.BandCombineOp;
 import java.util.Arrays;
 import java.util.List;
 
@@ -54,6 +53,7 @@ public class GestionnaireEvenementServeur implements GestionnaireEvenement {
             System.out.println("SERVEUR: Recu : " + evenement.getType() + " " + evenement.getArgument());
             typeEvenement = evenement.getType();
             cnx.setTempsDerniereOperation(System.currentTimeMillis());
+
             switchTraitement:
             switch (typeEvenement) {
                 /******************* COMMANDES GÉNÉRALES *******************/
@@ -74,7 +74,7 @@ public class GestionnaireEvenementServeur implements GestionnaireEvenement {
                     argument = evenement.getArgument();
                     t = argument.split(":");
                     if (t.length < 2) {
-                        cnx.envoyer("NOUVEAU NO");
+                        cnx.envoyer("NOUVEAU NO : Mauvais arguments");
                     } else {
                         numCompteClient = t[0];
                         nip = t[1];
@@ -86,7 +86,7 @@ public class GestionnaireEvenementServeur implements GestionnaireEvenement {
                             cnx.setCompteClient(compteClient);
                             cnx.setCompteBancaireActuel(compteClient.getComptes().get(0));
                             cnx.envoyer("NOUVEAU OK " + t[0] + " cree");
-                        } else cnx.envoyer("NOUVEAU NO " + t[0] + " existe");
+                        } else cnx.envoyer("NOUVEAU NO : Creation impossible"); // message générique car 3 causes probables : mauvais nip, mauvais num compte, ou existe déjà
                     }
                     break;
                 case "CONNECT": // Connection à un compte-client
@@ -98,7 +98,7 @@ public class GestionnaireEvenementServeur implements GestionnaireEvenement {
                         ConnexionBanque cb = (ConnexionBanque) c;
                         if (cb.getNumeroCompteClient() != null && cb.getNumeroCompteClient().equals(numCompteClientEvt)) {
                             cnx.envoyer("CONNECT NO: CLIENT ALREADY CONNECTED");
-                            break;
+                            break switchTraitement;
                         }
                     }
 
@@ -116,6 +116,8 @@ public class GestionnaireEvenementServeur implements GestionnaireEvenement {
                     cnx.setNumeroCompteClient(compteClient.getNumero());
                     cnx.setCompteClient(compteClient);
                     cnx.setNumeroCompteActuel(banque.getNumeroCompteParDefaut(compteClient.getNumero()));
+                    cnx.setCompteBancaireActuel(banque.getCompteParDefaut(compteClient.getNumero()));
+                    cnx.envoyer("CONNECT OK");
                     break;
                 case "DISCONNECT":
                     numCompteClient = cnx.getNumeroCompteClient().toUpperCase(); // copie le string
@@ -128,48 +130,55 @@ public class GestionnaireEvenementServeur implements GestionnaireEvenement {
                     break;
                 case "EPARGNE" :
                     //Verifier si le client est connecté et qu'il ne possède pas de compte épargne
-                    if (cnx.getCompteClient() == null) {
-                        boolean compteEp = false;
-                        for (CompteBancaire compte : cnx.getCompteClient().getComptes()) {
-                            if (compte.getType() == TypeCompte.EPARGNE) {
-                                compteEp = true;
-                                break;
-                            }
-                        }
-                        if (compteEp) {
-                            System.out.println("EPARGNE NO");
-                        } else {
-                            String numeroEp;
-                            do {
-                                numeroEp = CompteBancaire.genereNouveauNumero();
-                            } while (numeroEp != cnx.getNumeroCompteClient());
-                            CompteEpargne nouveauCompte = new CompteEpargne(numeroEp, TypeCompte.EPARGNE, 5);
-                        }
+                    if (cnx.getCompteClient() == null){
+                        cnx.envoyer("EPARGNE NO: Aucun client connecte");
+                        break;
                     }
 
-                // TODO 4.2 Ajouter EPARGNE (dépend de 4.1)
-                // TODO 5.1 Ajouter SELECT (dépend de Q2 et Q4)
-                // TODO 6.1 Ajouter DEPOT (dépend de Q2 et Q4)
-                // TODO 6.2 Ajouter RETRAIT (dépend de Q2 et Q4)
-                // TODO 6.3 Ajouter FACTURE (dépend de Q2 et Q4)
-                // TODO 6.4 Ajouter TRANSFER (dépend de Q2 et Q4)
+                    if(cnx.getCompteClient().getComptes().size() == 2){
+                        cnx.envoyer("EPARGNE NO: Client a deja un Compte-Epargne");
+                        break;
+                    }
 
+                    /*boolean compteEp = false;
+                    for (CompteBancaire compte : cnx.getCompteClient().getComptes()) {
+                        if (compte.getType() == TypeCompte.EPARGNE) {
+                            compteEp = true;
+                            break;
+                        }
+                    }*/
+
+                    /*if (compteEp) {
+                        cnx.envoyer("EPARGNE NO");
+                    } else {
+                        String numeroEp;
+                        do {
+                            numeroEp = CompteBancaire.genereNouveauNumero();
+                        } while (numeroEp != cnx.getNumeroCompteClient());
+                        CompteEpargne nouveauCompte = new CompteEpargne(numeroEp, TypeCompte.EPARGNE, 5);
+                    }*/
+
+                    banque = serveurBanque.getBanque();
+                    cnx.getCompteClient().ajouter(new CompteEpargne(banque.genererNumCompteBancaireUnique(), TypeCompte.EPARGNE, 5));
+                    cnx.setCompteBancaireActuel(cnx.getCompteClient().getCompte(1));
+                    cnx.setNumeroCompteActuel(cnx.getCompteClient().getCompte(1).getNumero());
+                    cnx.envoyer(String.format("EPARGNE %s OK", cnx.getCompteClient().getCompte(1).getNumero()));
+                    break;
                 case "SELECT":
                     if (cnx.getCompteClient() != null) {
-                        String typeCompte = evenement.getArgument();
+                        String typeCompte = evenement.getArgument().toUpperCase();
                         List<CompteBancaire> comptesBancaires = cnx.getCompteClient().getComptes();
                         for (CompteBancaire c : comptesBancaires) {
                             if (c.getType().toString().equals(typeCompte)) {
                                 cnx.setNumeroCompteActuel(c.getNumero());
                                 cnx.setCompteBancaireActuel(c);
-                                cnx.envoyer("SELECT OK");
+                                cnx.envoyer(String.format("SELECT OK : Compte %s", cnx.getNumeroCompteActuel()));
                                 break switchTraitement;
                             }
                         }
                     }
                     cnx.envoyer("SELECT NO");
                     break;
-
                 case "DEPOT":
                     if (cnx.getCompteClient() != null && cnx.getCompteBancaireActuel() != null) {
                         float montant = Float.parseFloat(evenement.getArgument());
@@ -180,7 +189,6 @@ public class GestionnaireEvenementServeur implements GestionnaireEvenement {
                     }
                     cnx.envoyer("DEPOT NO");
                     break;
-
                 case "RETRAIT":
                     if (cnx.getCompteClient() != null && cnx.getCompteBancaireActuel() != null) {
                         float montant = Float.parseFloat(evenement.getArgument());
@@ -191,7 +199,6 @@ public class GestionnaireEvenementServeur implements GestionnaireEvenement {
                     }
                     cnx.envoyer("RETRAIT NO");
                     break;
-
                 case "FACTURE":
                     if (cnx.getCompteClient() != null && cnx.getCompteBancaireActuel() != null) {
                         String[] args = evenement.getArgument().split(" ");
@@ -210,7 +217,6 @@ public class GestionnaireEvenementServeur implements GestionnaireEvenement {
                     }
                     cnx.envoyer("FACTURE NO");
                     break;
-
                 case "TRANSFER":
                     if (cnx.getCompteClient() != null && cnx.getCompteBancaireActuel() != null) {
                         String[] args = evenement.getArgument().split(" ");
@@ -228,15 +234,13 @@ public class GestionnaireEvenementServeur implements GestionnaireEvenement {
                     }
                     cnx.envoyer("TRANSFER NO");
                     break;
-
                 case "SOLDE":
                     if (cnx.getCompteClient() != null && cnx.getCompteBancaireActuel() != null) {
-                        cnx.envoyer("SOLDE OK: " + cnx.getCompteBancaireActuel().getSolde() + "$");
+                        cnx.envoyer(String.format("SOLDE Compte %s : %s", cnx.getNumeroCompteActuel(), cnx.getCompteBancaireActuel().getSolde()));
                         break;
                     }
                     cnx.envoyer("SOLDE NO");
                     break;
-
                 /******************* TRAITEMENT PAR DÉFAUT *******************/
                 default: //Renvoyer le texte recu convertit en majuscules :
                     msg = (evenement.getType() + " " + evenement.getArgument()).toUpperCase();
