@@ -7,12 +7,14 @@ import com.atoudeft.banque.TypeCompte;
 import com.atoudeft.banque.CompteEpargne;
 import com.atoudeft.banque.serveur.ConnexionBanque;
 import com.atoudeft.banque.serveur.ServeurBanque;
+import com.atoudeft.commun.PileChainee;
 import com.atoudeft.commun.evenement.Evenement;
 import com.atoudeft.commun.evenement.GestionnaireEvenement;
 import com.atoudeft.commun.net.Connexion;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Iterator;
 
 /**
  * Cette classe représente un gestionnaire d'événement d'un serveur. Lorsqu'un serveur reçoit un texte d'un client,
@@ -181,7 +183,8 @@ public class GestionnaireEvenementServeur implements GestionnaireEvenement {
                     break;
                 case "DEPOT":
                     if (cnx.getCompteClient() != null && cnx.getCompteBancaireActuel() != null) {
-                        float montant = Float.parseFloat(evenement.getArgument());
+                        // remplacer les virgules par des points pour eviter un crash si l'utilisateur netre une virgule par accident
+                        float montant = Float.parseFloat(evenement.getArgument().replace(",","."));
                         if (cnx.getCompteBancaireActuel().crediter(montant)) {
                             cnx.envoyer("DEPOT OK");
                             break;
@@ -191,7 +194,8 @@ public class GestionnaireEvenementServeur implements GestionnaireEvenement {
                     break;
                 case "RETRAIT":
                     if (cnx.getCompteClient() != null && cnx.getCompteBancaireActuel() != null) {
-                        float montant = Float.parseFloat(evenement.getArgument());
+                        // remplacer les virgules par des points pour eviter un crash si l'utilisateur netre une virgule par accident
+                        float montant = Float.parseFloat(evenement.getArgument().replace(",","."));
                         if (cnx.getCompteBancaireActuel().debiter(montant)) {
                             cnx.envoyer("RETRAIT OK");
                             break;
@@ -240,6 +244,22 @@ public class GestionnaireEvenementServeur implements GestionnaireEvenement {
                         break;
                     }
                     cnx.envoyer("SOLDE NO");
+                    break;
+                case "HIST":
+                    if(cnx.getCompteClient() != null && cnx.getCompteBancaireActuel() != null){
+                        if(cnx.getCompteBancaireActuel().getNumOperations() == 0){
+                            cnx.envoyer("Aucune operation au compte.");
+                        }else{
+                            String reponse = "HIST\n";
+                            Iterator<PileChainee.Noeud> it = cnx.getCompteBancaireActuel().getHistIterator();
+                            while(it.hasNext()){
+                                reponse = reponse.concat(it.next().getData().toString() + "\n");
+                            }
+                            cnx.envoyer(reponse);
+                        }
+                        break;
+                    }
+                    cnx.envoyer("HIST NO");
                     break;
                 /******************* TRAITEMENT PAR DÉFAUT *******************/
                 default: //Renvoyer le texte recu convertit en majuscules :
