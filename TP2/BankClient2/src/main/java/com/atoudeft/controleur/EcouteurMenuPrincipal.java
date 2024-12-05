@@ -1,6 +1,7 @@
 package com.atoudeft.controleur;
 
 import com.atoudeft.client.Client;
+import com.atoudeft.vue.PanneauConfigServeur;
 
 import javax.swing.*;
 import java.awt.*;
@@ -51,7 +52,37 @@ public class EcouteurMenuPrincipal implements ActionListener {
                     }
                     break;
                 case "CONFIGURER":
-                    //TODO : compléter (question 1.3)
+                    Object[] options = {"OK", "Annuler"};
+                    PanneauConfigServeur configServeur = new PanneauConfigServeur(client.getAdrServeur(), client.getPortServeur());
+                    boolean settingsOk = false;
+
+                    while(!settingsOk){
+                        res = JOptionPane.showOptionDialog(fenetre,
+                                configServeur,
+                                "Configuration serveur",
+                                JOptionPane.YES_NO_OPTION,
+                                JOptionPane.QUESTION_MESSAGE,
+                                null,
+                                options,
+                                options[0]);
+
+                        if(res == JOptionPane.OK_OPTION){
+                            client.setAdrServeur(configServeur.getAdresseServeur());
+                            try{
+                                client.setPortServeur(Integer.parseInt(configServeur.getPortServeur()));
+                                settingsOk = true;
+                            }
+                            catch(NumberFormatException e){
+                                JOptionPane.showMessageDialog(fenetre, "Le port doit être un nombre entier.",
+                                        "Erreur",
+                                        JOptionPane.ERROR_MESSAGE);
+                            }
+                        }
+                        else if(res == JOptionPane.NO_OPTION){
+                            settingsOk = true;
+                        }
+                    }
+
                     break;
                 case "QUITTER":
                     if (client.isConnecte()) {

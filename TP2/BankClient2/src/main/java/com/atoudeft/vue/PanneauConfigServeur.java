@@ -13,7 +13,24 @@ public class PanneauConfigServeur extends JPanel {
     private JTextField txtAdrServeur, txtNumPort;
 
     public PanneauConfigServeur(String adr, int port) {
-        //à compléter
+        txtAdrServeur = new JTextField(30);
+        txtAdrServeur.setText(adr);
+        txtNumPort = new JTextField(30);
+        txtNumPort.setText(Integer.toString(port));
+        JLabel labelAdrServeur = new JLabel("Adresse IP : ");
+        JLabel labelNumPort = new JLabel("Port : ");
+
+        JPanel pNORTH = new JPanel();
+        JPanel pSOUTH = new JPanel();
+        JPanel pTout = new JPanel(new GridLayout(2,2));
+
+        pNORTH.add(labelAdrServeur, BorderLayout.WEST);
+        pNORTH.add(txtAdrServeur, BorderLayout.EAST);
+        pSOUTH.add(labelNumPort, BorderLayout.WEST);
+        pSOUTH.add(txtNumPort, BorderLayout.EAST);
+        pTout.add(pNORTH, BorderLayout.NORTH);
+        pTout.add(pSOUTH, BorderLayout.SOUTH);
+        this.add(pTout);
     }
     public String getAdresseServeur() {
         return txtAdrServeur.getText();
