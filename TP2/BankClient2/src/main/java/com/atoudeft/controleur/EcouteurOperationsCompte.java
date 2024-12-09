@@ -36,7 +36,7 @@ public class EcouteurOperationsCompte implements ActionListener {
                     // montrer les panneau d'opérations
                     break;
                 case "HIST":
-                    // montrer les panneau d'historique
+                    client.envoyer("HIST");
                     break;
             }
         }
