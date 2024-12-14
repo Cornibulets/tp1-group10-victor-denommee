@@ -7,10 +7,6 @@ import com.atoudeft.controleur.EcouteurOperationsCompte;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Vector;
 
 /**
  *
@@ -23,6 +19,7 @@ public class PanneauPrincipal  extends JPanel {
     private PanneauConnexion panneauConnexion;
     private JPanel panneauCompteClient;
     private PanneauOperationsCompte panneauOperationsCompte;
+    private PanneauFormOperation panneauFormOperation;
 
     private DefaultListModel<String> numerosComptes;
     private JList<String> jlNumerosComptes;
@@ -35,8 +32,12 @@ public class PanneauPrincipal  extends JPanel {
         panneauConnexion = new PanneauConnexion();
         panneauConnexion.setEcouteur(new EcouteurConnexion(client,panneauConnexion));
 
+
+        panneauFormOperation = new PanneauFormOperation();
+        panneauFormOperation.setEcouteur(new EcouteurOperationsCompte(client, panneauFormOperation));
+
         panneauOperationsCompte = new PanneauOperationsCompte();
-        panneauOperationsCompte.setEcouteur(new EcouteurOperationsCompte(client));
+        panneauOperationsCompte.setEcouteur(new EcouteurOperationsCompte(client, panneauFormOperation));
 
         panneauCompteClient = new JPanel();
 
@@ -54,6 +55,7 @@ public class PanneauPrincipal  extends JPanel {
 
         panneauCompteClient.add(panneauOperationsCompte, BorderLayout.NORTH);
         panneauCompteClient.add(jlNumerosComptes, BorderLayout.WEST);
+        panneauCompteClient.add(panneauFormOperation, BorderLayout.CENTER);
         //Enregistrement de l'écouteur de souris:
         jlNumerosComptes.addMouseListener(new EcouteurListeComptes(client));
 
@@ -81,6 +83,10 @@ public class PanneauPrincipal  extends JPanel {
     public void cacherPanneauCompteClient() {
         panneauCompteClient.setVisible(false);
         this.numerosComptes.clear();
+    }
+
+    public void setSolde(double solde) {
+        this.panneauOperationsCompte.setSolde(solde);
     }
     public void montrerPanneauCompteClient() {
         panneauCompteClient.setVisible(true);

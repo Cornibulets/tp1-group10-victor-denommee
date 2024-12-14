@@ -34,6 +34,10 @@ public class PanneauOperationsCompte extends JPanel {
         this.add(bFacture);
         this.add(bHistorique);
     }
+
+    public void setSolde(double solde) {
+        lblSolde.setText("Solde: " + String.valueOf(solde));
+    }
     public void setEcouteur(ActionListener ecouteur) {
         bEpargne.addActionListener(ecouteur);
         bDepot.addActionListener(ecouteur);

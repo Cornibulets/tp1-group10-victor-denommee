@@ -268,13 +268,13 @@ public class GestionnaireEvenementServeur implements GestionnaireEvenement {
                     //On vérifie si le client n'est pas encore connecté à son compte-client :
                     numCompteClient = cnx.getNumeroCompteClient();
                     if (numCompteClient==null) {
-                        cnx.envoyer("TRANSFER NO");
+                        cnx.envoyer("TRANSFER NO1");
                         break;
                     }
                     argument = evenement.getArgument();
                     t = argument.split(" ");
                     if (t.length<2) { //Pas assez d'arguments dans la commande
-                        cnx.envoyer("TRANSFER NO");
+                        cnx.envoyer("TRANSFER NO2");
                         break;
                     }
                     try {
@@ -284,7 +284,7 @@ public class GestionnaireEvenementServeur implements GestionnaireEvenement {
                             cnx.envoyer("TRANSFER OK "+solde);
                         }
                         else {
-                            cnx.envoyer("TRANSFER NO");
+                            cnx.envoyer("TRANSFER NO3");
                         }
                     }
                     catch (NumberFormatException exp) {

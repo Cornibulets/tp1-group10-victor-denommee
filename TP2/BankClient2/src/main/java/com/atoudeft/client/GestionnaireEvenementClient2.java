@@ -8,6 +8,7 @@ import com.atoudeft.vue.PanneauPrincipal;
 import com.programmes.MainFrame;
 
 import javax.swing.*;
+import java.util.Objects;
 
 public class GestionnaireEvenementClient2 implements GestionnaireEvenement {
     private Client client;
@@ -36,6 +37,7 @@ public class GestionnaireEvenementClient2 implements GestionnaireEvenement {
         if (source instanceof Connexion) {
             //cnx = (Connexion) source;
             typeEvenement = evenement.getType();
+            String[] args = evenement.getArgument().split(" ");
             switch (typeEvenement) {
                 /******************* COMMANDES GÉNÉRALES *******************/
                 case "END": //Le serveur demande de fermer la connexion
@@ -92,25 +94,47 @@ public class GestionnaireEvenementClient2 implements GestionnaireEvenement {
                     break;
                 case "SELECT" :
                     arg = evenement.getArgument();
-                    JOptionPane.showMessageDialog(panneauPrincipal,"SELECT "+arg);
+//                    JOptionPane.showMessageDialog(panneauPrincipal,"SELECT "+arg);
+                    if (Objects.equals(args[0], "OK")) {
+                        panneauPrincipal.setSolde(Double.parseDouble(args[2].replace(",", ".")));
+                    }
+                    for (String argument : args) {
+                        System.out.println(argument);
+                    }
+//                    panneauPrincipal.setSolde();
+
                     break;
 
                 /******************* OPÉRATIONS BANCAIRES *******************/
                 case "DEPOT" :
                     arg = evenement.getArgument();
                     JOptionPane.showMessageDialog(panneauPrincipal,"DEPOT "+arg);
+                    args = arg.split(" ");
+                    if (arg.contains("OK")) {
+                        panneauPrincipal.setSolde(Double.parseDouble(args[1].replace(",", ".")));
+                    }
                     break;
                 case "RETRAIT" :
                     arg = evenement.getArgument();
                     JOptionPane.showMessageDialog(panneauPrincipal,"RETRAIT "+arg);
+                    if (Objects.equals(args[0], "OK")) {
+                        panneauPrincipal.setSolde(Double.parseDouble(args[1].replace(",", ".")));
+                    }
                     break;
                 case "FACTURE" :
                     arg = evenement.getArgument();
                     JOptionPane.showMessageDialog(panneauPrincipal,"FACTURE" + arg);
+                    if (Objects.equals(args[0], "OK")) {
+                        panneauPrincipal.setSolde(Double.parseDouble(args[1].replace(",", ".")));
+                    }
                     break;
                 case "TRANSFER" :
                     arg = evenement.getArgument();
                     JOptionPane.showMessageDialog(panneauPrincipal,"TRANSFER " + arg);
+
+                    if (Objects.equals(args[0], "OK")) {
+                        panneauPrincipal.setSolde(Double.parseDouble(args[1].replace(",", ".")));
+                    }
                     break;
                 /******************* TRAITEMENT PAR DÉFAUT *******************/
                 default:
